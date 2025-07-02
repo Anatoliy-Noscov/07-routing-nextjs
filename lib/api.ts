@@ -1,43 +1,53 @@
 import axios from "axios";
 import type { CreateNoteValues, Note, FetchNotesValues } from "../types/note";
 import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
 
 axios.defaults.baseURL = "https://notehub-public.goit.study/api";
 
-interface ParamsTypes {
-  page: number;
-  perPage: number;
-  search?: string;
-  tag?: string;
-}
+axios.interceptors.request.use((config) => {
+  if (process.env.NEXT_PUBLIC_NOTEHUB_TOKEN) {
+    config.headers.Authorization = `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`;
+  }
+  return config;
+});
 
 export async function fetchNotes(
   search: string,
   page: number,
-  tag: string | undefined
-): Promise<FetchNotesValues | undefined> {
+  tag?: string
+): Promise<FetchNotesValues> {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    perPage: "12",
+    ...(search && { search }),
+    ...(tag && { tag }),
+  });
+
   try {
-    const perPage = 12;
-    const params: ParamsTypes = {
-      tag,
-      page,
-      perPage,
-    };
-    if (search?.trim()) {
-      params.search = search;
-    }
-    if (tag?.trim()) {
-      params.tag = tag;
-    }
-    const res = await axios.get<FetchNotesValues>("/notes", {
-      params,
-      headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-      },
-    });
+    const res = await axios.get<FetchNotesValues>(
+      `/notes?${params.toString()}`
+    );
     return res.data;
   } catch (error) {
-    toast.error(error instanceof Error ? error.message : String(error));
+    if (axios.isAxiosError(error)) {
+      toast.error(error.response?.data?.message || error.message);
+    } else {
+      toast.error("An unknown error occurred");
+    }
+    throw error;
+  }
+}
+
+export async function fetchNoteById(id: number): Promise<Note> {
+  try {
+    const res = await axios.get<Note>(`/notes/${id}`);
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      throw new Error("Note not found");
+    }
+    throw error;
   }
 }
 
@@ -45,49 +55,40 @@ export async function createNote({
   title,
   content,
   tag,
-}: CreateNoteValues): Promise<Note | undefined> {
+}: CreateNoteValues): Promise<Note> {
   try {
-    const params: CreateNoteValues = {
-      title,
-      content,
-      tag,
-    };
-
-    const res = await axios.post<Note>("/notes", params, {
-      headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-      },
-    });
+    const res = await axios.post<Note>("/notes", { title, content, tag });
+    toast.success("Note created successfully");
     return res.data;
   } catch (error) {
-    toast.error(error instanceof Error ? error.message : String(error));
+    toast.error(
+      axios.isAxiosError(error)
+        ? error.response?.data?.message || error.message
+        : "Failed to create note"
+    );
+    throw error;
   }
 }
 
-export async function deleteNote(id: number): Promise<Note | undefined> {
+export async function deleteNote(id: number): Promise<void> {
   try {
-    const res = await axios.delete<Note>(`/notes/${id}`, {
-      headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-      },
-    });
-    return res.data;
+    await axios.delete(`/notes/${id}`);
+    toast.success("Note deleted successfully");
   } catch (error) {
-    toast.error(error instanceof Error ? error.message : String(error));
+    toast.error(
+      axios.isAxiosError(error)
+        ? error.response?.data?.message || error.message
+        : "Failed to delete note"
+    );
+    throw error;
   }
 }
 
-export default async function fetchNoteId(
-  id: number
-): Promise<Note | undefined> {
-  try {
-    const res = await axios.get<Note>(`notes/${id}`, {
-      headers: {
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
-      },
-    });
-    return res.data;
-  } catch (error) {
-    toast.error(error instanceof Error ? error.message : String(error));
-  }
+export function useNote(id: number) {
+  return useQuery({
+    queryKey: ["note", id],
+    queryFn: () => fetchNoteById(id),
+    refetchOnMount: false,
+    retry: false,
+  });
 }

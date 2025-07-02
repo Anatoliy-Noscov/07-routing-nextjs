@@ -2,14 +2,14 @@ import css from "./SidebarNotes.module.css";
 import Link from "next/link";
 
 interface SidebarNotesProps {
-  tags: string[];
+  tags: readonly string[];
 }
 
 export default function SidebarNotes({ tags }: SidebarNotesProps) {
   return (
     <ul className={css.menuList}>
       <li className={css.menuItem}>
-        <Link href={`/notes/filter/all`} className={css.menuLink}>
+        <Link href="/notes/filter" className={css.menuLink}>
           All notes
         </Link>
       </li>
