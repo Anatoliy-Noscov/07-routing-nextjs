@@ -74,7 +74,9 @@ export default function NotesClient({
 
       {isLoading && <Loader />}
       {isError && <ErrorMessage error={error} />}
-      {!isSuccess && <NoteList notes={notesRequest} />}
+      {isSuccess && notesRequest.length > 0 && (
+        <NoteList notes={notesRequest} />
+      )}
       {isModalOpen && (
         <Modal onClose={closeModal}>
           <NoteForm onClose={closeModal} />
