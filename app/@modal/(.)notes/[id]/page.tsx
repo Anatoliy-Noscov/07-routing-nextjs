@@ -7,11 +7,12 @@ import {
 import NotePreviewClient from "./NotePreview.client";
 import { notFound } from "next/navigation";
 
-export default async function NoteModal({
-  params,
-}: {
+interface Props {
   params: { id: string };
-}) {
+  searchParams?: Record<string, string>;
+}
+
+export default async function NoteModal({ params }: Props) {
   const queryClient = new QueryClient();
 
   try {
