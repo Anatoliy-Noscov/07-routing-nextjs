@@ -81,7 +81,7 @@ export default async function fetchNoteId(
   id: number
 ): Promise<Note | undefined> {
   try {
-    const res = await axios.get<Note>(`notes/${id}`, {
+    const res = await axios.get<Note>(`/notes/${id}`, {
       headers: {
         Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
       },
