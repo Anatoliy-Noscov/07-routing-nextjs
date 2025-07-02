@@ -1,16 +1,7 @@
-import css from "./SidebarNotes.module.css";
+import SidebarNotes from "../../../../components/SidebarNotes/SidebarNotes";
 
-const SidebarNotes = () => {
-  return (
-    <ul className={css.menuList}>
-      {/* список тегів */}
-      <li className={css.menuItem}>
-        <a href={`/notes/filter/{tag}`} className={css.menuLink}>
-          Назва тегу
-        </a>
-      </li>
-    </ul>
-  );
-};
+const tagArray: string[] = ["Work", "Personal", "Meeting", "Shopping", "Todo"];
 
-export default SidebarNotes;
+export default function Sidebar() {
+  return <SidebarNotes tags={tagArray} />;
+}

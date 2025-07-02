@@ -11,11 +11,6 @@ interface ParamsTypes {
   tag?: string;
 }
 
-// interface FetchNotesValues {
-//   notes: Note[];
-//   totalPages: number;
-// }
-
 export async function fetchNotes(
   search: string,
   page: number,

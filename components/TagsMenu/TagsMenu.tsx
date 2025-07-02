@@ -4,6 +4,8 @@ import css from "./TagsMenu.module.css";
 import { useState } from "react";
 import Link from "next/link";
 
+const tags: string[] = ["Work", "Personal", "Meeting", "Shopping", "Todo"];
+
 const TagsMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => setIsOpen(!isOpen);
@@ -16,12 +18,26 @@ const TagsMenu = () => {
 
       {isOpen && (
         <ul className={css.menuList}>
-          {/* список тегів */}
           <li className={css.menuItem}>
-            <Link href={`/notes/filter/Work`} className={css.menuLink}>
-              Назва тегу
+            <Link
+              href={`/notes/filter/all`}
+              className={css.menuLink}
+              onClick={toggle}
+            >
+              All notes
             </Link>
           </li>
+          {tags.map((tag) => (
+            <li key={tag} className={css.menuItem}>
+              <Link
+                href={`/notes/filter/${tag}`}
+                onClick={toggle}
+                className={css.menuLink}
+              >
+                {tag}
+              </Link>
+            </li>
+          ))}
         </ul>
       )}
     </div>
@@ -29,20 +45,3 @@ const TagsMenu = () => {
 };
 
 export default TagsMenu;
-
-{
-  /* <ul className={css.menu}>
-  <li className={css.menuItem}>
-    <Link href={`/notes/filter/all`} onClick={toggle}>
-      All notes
-    </Link>
-  </li>
-  {categories.map((category) => (
-    <li key={category.id} className={css.menuItem}>
-      <Link href={`/notes/filter/${category.id}`} onClick={toggle}>
-        {category.name}
-      </Link>
-    </li>
-  ))}
-</ul>; */
-}
