@@ -5,6 +5,7 @@ import {
   dehydrate,
 } from "@tanstack/react-query";
 import NotePreviewClient from "./NotePreview.client";
+import { notFound } from "next/navigation";
 
 export default async function NoteModal({
   params,
@@ -13,10 +14,14 @@ export default async function NoteModal({
 }) {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: ["note", params.id],
-    queryFn: () => fetchNoteById(Number(params.id)),
-  });
+  try {
+    await queryClient.prefetchQuery({
+      queryKey: ["note", params.id],
+      queryFn: () => fetchNoteById(Number(params.id)),
+    });
+  } catch {
+    notFound();
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
