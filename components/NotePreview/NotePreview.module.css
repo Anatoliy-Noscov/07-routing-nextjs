@@ -49,6 +49,7 @@
   border: 1px solid #b6d4fe;
   border-radius: 12px;
   max-width: 100px;
+  text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -44,7 +44,7 @@ export default function NoteForm({ onClose }: NoteFormProps) {
 
   function handleSubmit(
     values: CreateNoteValues,
-    actions: FormikHelpers<CreateNoteValues>,
+    actions: FormikHelpers<CreateNoteValues>
   ) {
     mutationCreate.mutate(values);
     actions.resetForm();
